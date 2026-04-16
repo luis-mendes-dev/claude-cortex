@@ -19,7 +19,7 @@ Session starts -->  Inject top 10 patterns  -->  Claude sees them automatically
 
 ```bash
 # Add the marketplace
-claude plugin marketplace add johndoe/claude-cortex
+claude plugin marketplace add luis-mendes-dev/claude-cortex
 
 # Install the plugin
 claude plugin install claude-cortex@claude-cortex

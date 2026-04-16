@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "author": {
     "name": "Luis Mendes",
-    "url": "https://github.com/johndoe"
+    "url": "https://github.com/luis-mendes-dev"
   },
-  "repository": "https://github.com/johndoe/claude-cortex",
-  "homepage": "https://github.com/johndoe/claude-cortex",
+  "repository": "https://github.com/luis-mendes-dev/claude-cortex",
+  "homepage": "https://github.com/luis-mendes-dev/claude-cortex",
   "license": "MIT",
   "keywords": [
     "learning",
