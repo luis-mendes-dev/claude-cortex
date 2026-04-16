@@ -57,7 +57,7 @@ Patterns observed multiple times across multiple sessions score higher.
 
 Patterns with confidence >= 0.85 seen in 3+ sessions are promoted:
 - **Single patterns** become rules in `~/.claude/CLAUDE.md` under `## Learned Rules`
-- **Clusters of 3+ related patterns** become slash commands in `~/.claude/commands/` (e.g., `/cortex-learned-pattern`)
+- **Clusters of 3+ related patterns** become rule files in `~/.claude/rules/` (auto-loaded every session, no slash command needed)
 - **Project-scoped patterns** (seen in only 1 project) stay local
 
 ### Decay (weekly, Sunday 3am)
@@ -108,8 +108,8 @@ All data lives in `~/.claude/learning/`:
   rules/retired/      # Decayed rules (audit trail)
   logs/cortex.log     # Unified log
 
-# Auto-generated skill files go to ~/.claude/commands/ so Claude Code discovers them:
-~/.claude/commands/
+# Auto-generated rule files (auto-loaded every session):
+~/.claude/rules/
   cortex-learned-pattern.md    # Example: clustered pattern learnings
   cortex-learned-correction.md # Example: clustered correction learnings
 ```

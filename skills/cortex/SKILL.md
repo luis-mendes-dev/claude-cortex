@@ -24,7 +24,7 @@ Cortex is a background learning system that captures knowledge from your Claude 
 
 1. **Capture** (SessionEnd): Haiku analyzes the session transcript and extracts corrections, patterns, decisions, gotchas, and mistakes
 2. **Compile** (daily 2am): Merges daily extractions into deduplicated knowledge articles with confidence scores
-3. **Promote** (weekly Sunday 3am): Promotes articles with confidence >= 0.85 and 3+ sessions to CLAUDE.md rules. Clusters of 3+ related articles become slash commands in `~/.claude/commands/` (prefixed `cortex-learned-`).
+3. **Promote** (weekly Sunday 3am): Promotes articles with confidence >= 0.85 and 3+ sessions to CLAUDE.md rules. Clusters of 3+ related articles become rule files in `~/.claude/rules/` (prefixed `cortex-learned-`, auto-loaded every session).
 4. **Decay** (weekly Sunday 3am): Reduces confidence of patterns not seen in 14+ days. Retires patterns below 0.40 confidence.
 5. **Inject** (SessionStart): Prints the top 10 most relevant patterns for the current project
 

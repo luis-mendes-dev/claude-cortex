@@ -209,8 +209,8 @@ def rules_retired_dir() -> Path:
 
 
 def skills_dir() -> Path:
-    # Write to ~/.claude/commands/ so Claude Code auto-discovers them as slash commands
-    return Path.home() / ".claude" / "commands"
+    # Write to ~/.claude/rules/ so Claude Code auto-loads them every session
+    return Path.home() / ".claude" / "rules"
 
 
 def global_claude_md() -> Path:
@@ -720,7 +720,7 @@ def cmd_status(args):
     kdir = knowledge_dir()
     article_count = len(list(kdir.glob("*.md"))) if kdir.exists() else 0
     rule_count = len(list(rules_active_dir().glob("*.md"))) if rules_active_dir().exists() else 0
-    skill_count = len(list(skills_dir().glob("cortex-learned-*.md"))) if skills_dir().exists() else 0
+    skill_count = len([f for f in skills_dir().glob("cortex-learned-*.md") if f.is_file()]) if skills_dir().exists() else 0
     retired_count = len(list(rules_retired_dir().glob("*.md"))) if rules_retired_dir().exists() else 0
 
     last_capture = last_compile = last_promote = "never"
