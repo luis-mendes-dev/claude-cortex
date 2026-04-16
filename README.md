@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python 3.10+">
-  <img src="https://img.shields.io/badge/Commands-3-purple.svg" alt="Commands">
+  <img src="https://img.shields.io/badge/Commands-4-purple.svg" alt="Commands">
   <img src="https://img.shields.io/badge/Hooks-2-orange.svg" alt="Hooks">
   <img src="https://img.shields.io/badge/Built_for-Claude_Code-blueviolet.svg" alt="Built for Claude Code">
   <img src="https://img.shields.io/badge/Zero-Manual_Steps-brightgreen.svg" alt="Zero Manual Steps">
@@ -139,6 +139,7 @@ After setup, just use Claude Code normally. Cortex runs entirely in the backgrou
 | Command | What it does |
 |---------|-------------|
 | `/cortex` | Show status dashboard: knowledge articles, active rules, learned skills, decay state |
+| `/cortex:learned` | Show what Cortex has learned: all knowledge articles grouped by confidence tier |
 | `/cortex:setup` | First-run setup: creates directories, copies config, schedules background jobs |
 | `/cortex:compile` | Manually trigger compile: sweep uncaptured sessions + process daily files into knowledge |
 

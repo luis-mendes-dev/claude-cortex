@@ -20,7 +20,7 @@
     "feedback-loop"
   ],
   "skills": ["./skills/cortex"],
-  "commands": ["./commands/cortex.md", "./commands/cortex/setup.md", "./commands/cortex/compile.md"],
+  "commands": ["./commands/cortex.md", "./commands/cortex/setup.md", "./commands/cortex/compile.md", "./commands/cortex/learned.md"],
   "hooks": "./.claude-plugin/hooks.json",
   "interface": {
     "displayName": "Cortex",
