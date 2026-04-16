@@ -264,6 +264,16 @@ All data is markdown with YAML frontmatter. No databases, no binary formats.
 
 ---
 
+## Privacy & Security
+
+- **All data stays local.** Knowledge articles, daily extractions, and logs live in `~/.claude/learning/` as markdown files on your machine.
+- **No external services.** Cortex has zero HTTP calls or network operations. The only external communication is through the `claude` CLI (which sends data to the Anthropic API -- the same API you already use during sessions).
+- **Session transcripts are reprocessed.** The capture stage sends up to 50K chars of your session transcript to Haiku for extraction. This means session content (which may include code, error messages, or text you typed) is re-sent to the Anthropic API after the session ends.
+- **CLAUDE.md is backed up.** Before every modification, Cortex creates a `.cortex-bak` backup of your CLAUDE.md file.
+- **Prompt injection mitigated.** Session transcripts are wrapped in XML fences with explicit instructions to ignore embedded instructions, reducing the risk of adversarial content in tool outputs manipulating extracted learnings.
+
+---
+
 ## Requirements
 
 | Requirement | Version | Notes |
