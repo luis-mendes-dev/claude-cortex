@@ -56,7 +56,8 @@ echo ""
 # --- Create directories ---
 
 echo "Creating directories..."
-mkdir -p "$LEARNING_DIR"/{daily,knowledge,rules/active,rules/retired,skills,logs}
+mkdir -p "$LEARNING_DIR"/{daily,knowledge,rules/active,rules/retired,logs}
+mkdir -p "$HOME/.claude/commands"
 echo "  $LEARNING_DIR/ created"
 
 # --- Copy config ---

@@ -209,7 +209,8 @@ def rules_retired_dir() -> Path:
 
 
 def skills_dir() -> Path:
-    return LEARNING_DIR / "skills"
+    # Write to ~/.claude/commands/ so Claude Code auto-discovers them as slash commands
+    return Path.home() / ".claude" / "commands"
 
 
 def global_claude_md() -> Path:
@@ -600,7 +601,7 @@ def cmd_promote(args):
             learnings_text = "\n".join(f"- {b}" for _, _, b in high_conf)
             skill_content = ask_haiku(SKILL_PROMPT.format(domain=article_type, learnings=learnings_text), timeout=30)
             if skill_content:
-                skill_path = sdir / f"learned-{article_type}.md"
+                skill_path = sdir / f"cortex-learned-{article_type}.md"
                 skill_path.write_text(skill_content)
                 existing_skills.append(skill_path)
                 log.info(f"Generated skill: {skill_path.name}")
@@ -719,7 +720,7 @@ def cmd_status(args):
     kdir = knowledge_dir()
     article_count = len(list(kdir.glob("*.md"))) if kdir.exists() else 0
     rule_count = len(list(rules_active_dir().glob("*.md"))) if rules_active_dir().exists() else 0
-    skill_count = len(list(skills_dir().glob("*.md"))) if skills_dir().exists() else 0
+    skill_count = len(list(skills_dir().glob("cortex-learned-*.md"))) if skills_dir().exists() else 0
     retired_count = len(list(rules_retired_dir().glob("*.md"))) if rules_retired_dir().exists() else 0
 
     last_capture = last_compile = last_promote = "never"
