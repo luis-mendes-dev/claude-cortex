@@ -709,7 +709,7 @@ def cmd_promote(args):
         if len(active_rules) + len(new_rules) >= max_rules:
             log.warning(f"Rule limit ({max_rules}) reached")
             break
-        rule_text = ask_haiku(RULE_PROMPT.format(learning=body), timeout=15)
+        rule_text = ask_haiku(RULE_PROMPT.format(learning=body), timeout=30)
         if not rule_text:
             continue
         rule_text = rule_text.strip().strip('"').strip("'")
