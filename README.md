@@ -5,15 +5,18 @@
 Cortex captures what you teach Claude Code and makes it permanent. Corrections, patterns, decisions, and mistakes from every session are extracted, compiled into knowledge, and promoted into your CLAUDE.md rules and skill files automatically. Stale patterns decay and retire. Zero manual steps after setup.
 
 ```
-Session ends  -->  Haiku extracts learnings  -->  daily/2026-04-16-myproject.md
-                                                         |
-Daily 2am     -->  Deduplicate & score      -->  knowledge/use-guard-clauses.md
-                                                         |
-Weekly Sun    -->  Promote high-confidence   -->  ~/.claude/CLAUDE.md (## Learned Rules)
-              -->  Decay stale patterns      -->  rules/retired/
-                                                         |
-Session starts -->  Inject top 10 patterns  -->  Claude sees them automatically
+Session ends   -->  Haiku extracts learnings  -->  daily/YYYY-MM-DD-myproject.md
+                                                          |
+Daily 2am      -->  Deduplicate & score       -->  knowledge/use-guard-clauses.md
+                                                          |
+Weekly Sun 3am -->  Promote high-confidence   -->  ~/.claude/CLAUDE.md (## Learned Rules)
+                                               -->  ~/.claude/rules/cortex-learned-*.md
+               -->  Decay stale patterns      -->  rules/retired/
+                                                          |
+Session starts -->  Inject top 10 patterns    -->  Claude sees them automatically
 ```
+
+> **Note:** Hooks are installed immediately on plugin install, but they silently no-op until you run `/cortex:setup`. This creates the data directories and schedules the background jobs.
 
 ## Install
 
