@@ -470,10 +470,10 @@ def parse_daily_entries(body: str) -> list[dict]:
 
 def find_duplicate(text: str, articles: list[tuple[Path, dict, str]]) -> Optional[Path]:
     for path, meta, body in articles:
-        response = ask_haiku(DEDUP_PROMPT.format(a=text, b=body), timeout=30)
+        response = ask_haiku(DEDUP_PROMPT.format(a=text, b=body), timeout=60)
         if response is None:
             # Retry once on timeout
-            response = ask_haiku(DEDUP_PROMPT.format(a=text, b=body), timeout=30)
+            response = ask_haiku(DEDUP_PROMPT.format(a=text, b=body), timeout=60)
         if response and response.strip().upper().startswith("YES"):
             return path
     return None
@@ -709,7 +709,7 @@ def cmd_promote(args):
         if len(active_rules) + len(new_rules) >= max_rules:
             log.warning(f"Rule limit ({max_rules}) reached")
             break
-        rule_text = ask_haiku(RULE_PROMPT.format(learning=body), timeout=30)
+        rule_text = ask_haiku(RULE_PROMPT.format(learning=body), timeout=60)
         if not rule_text:
             continue
         rule_text = rule_text.strip().strip('"').strip("'")
@@ -749,7 +749,7 @@ def cmd_promote(args):
                      if m.get("confidence", 0) >= skill_conf and m.get("sessions", 0) >= skill_min_sess]
         if len(high_conf) >= skill_min_articles and len(existing_skills) < max_skills:
             learnings_text = "\n".join(f"- {b}" for _, _, b in high_conf)
-            skill_content = ask_haiku(SKILL_PROMPT.format(domain=article_type, learnings=learnings_text), timeout=30)
+            skill_content = ask_haiku(SKILL_PROMPT.format(domain=article_type, learnings=learnings_text), timeout=60)
             if skill_content:
                 skill_path = sdir / f"cortex-learned-{article_type}.md"
                 skill_path.write_text(skill_content)

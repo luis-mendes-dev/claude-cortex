@@ -1,6 +1,6 @@
 capture:
   max_transcript_chars: 50000
-  timeout_seconds: 30
+  timeout_seconds: 60
   claude_model: haiku
 
 compile:
