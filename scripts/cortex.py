@@ -479,7 +479,7 @@ def find_duplicate(text: str, articles: list[tuple[Path, dict, str]]) -> Optiona
     return None
 
 
-def sweep_uncaptured_sessions(max_sessions: int = 20):
+def sweep_uncaptured_sessions(max_sessions: int = 100):
     """Capture learnings from recent sessions that were missed (e.g., terminal closed).
     Limits to max_sessions per run to avoid long first-run sweeps."""
     projects_dir = Path.home() / ".claude" / "projects"
