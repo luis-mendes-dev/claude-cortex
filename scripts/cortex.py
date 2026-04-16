@@ -487,7 +487,7 @@ def sweep_uncaptured_sessions(max_sessions: int = 20):
         return
     ddir = daily_dir()
     ddir.mkdir(parents=True, exist_ok=True)
-    cutoff = datetime.now() - timedelta(hours=36)
+    cutoff = datetime.now() - timedelta(days=7)
 
     # Collect all candidate sessions, sort by recency, cap at max_sessions
     candidates = []
