@@ -391,10 +391,57 @@ def find_duplicate(text: str, articles: list[tuple[Path, dict, str]]) -> Optiona
     return None
 
 
+def sweep_uncaptured_sessions():
+    """Capture learnings from recent sessions that were missed (e.g., terminal closed)."""
+    projects_dir = Path.home() / ".claude" / "projects"
+    if not projects_dir.exists():
+        return
+    ddir = daily_dir()
+    ddir.mkdir(parents=True, exist_ok=True)
+    cutoff = datetime.now() - timedelta(hours=36)
+
+    for project_dir in projects_dir.iterdir():
+        if not project_dir.is_dir():
+            continue
+        for jsonl in project_dir.glob("*.jsonl"):
+            mtime = datetime.fromtimestamp(jsonl.stat().st_mtime)
+            if mtime < cutoff:
+                continue
+            session_date = date.fromtimestamp(jsonl.stat().st_mtime).isoformat()
+            # Derive project name from the encoded path
+            project_name = project_dir.name.rsplit("-", 1)[-1] if "-" in project_dir.name else project_dir.name
+            daily_file = ddir / f"{session_date}-{project_name}.md"
+            # Skip if already captured (session ID appears in daily file)
+            if daily_file.exists() and jsonl.stem in daily_file.read_text():
+                continue
+            # Run capture on this session
+            max_chars = cfg("capture.max_transcript_chars", 50000)
+            raw = jsonl.read_text()
+            if len(raw) < 500:
+                continue
+            transcript = raw[-max_chars:] if len(raw) > max_chars else raw
+            result = ask_haiku(CAPTURE_PROMPT.format(transcript=transcript), timeout=60)
+            if not result:
+                result = regex_fallback(transcript)
+            if not result or result.strip() == "":
+                continue
+            if daily_file.exists():
+                existing = daily_file.read_text()
+                daily_file.write_text(f"{existing}\n\n---\n\n## Session: {jsonl.stem}\n\n{result}\n")
+            else:
+                meta = {"date": session_date, "project": project_name, "compiled": False}
+                write_article(daily_file, meta, f"## Session: {jsonl.stem}\n\n{result}")
+            log.info(f"Sweep captured: {jsonl.stem} -> {daily_file.name}")
+
+
 def cmd_compile(args):
     if not is_setup():
         return
     log.info("Starting compile...")
+
+    # Sweep for sessions missed by SessionEnd hook (terminal closed, etc.)
+    sweep_uncaptured_sessions()
+
     ddir = daily_dir()
     if not ddir.exists():
         log.info("No daily directory")

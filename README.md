@@ -46,6 +46,8 @@ When a Claude Code session ends, Cortex sends the transcript to Haiku and extrac
 
 Cost: ~$0.01-0.03 per session. Falls back to regex if Haiku is unavailable.
 
+**Missed sessions:** If you close the terminal instead of exiting Claude Code gracefully (Ctrl+C, `/exit`), the SessionEnd hook may not fire. No data is lost -- the daily compile job (2am) sweeps for uncaptured recent sessions and extracts their learnings retroactively.
+
 ### Compile (daily at 2am)
 
 Merges daily extractions into deduplicated knowledge articles. Each article has a confidence score based on:
