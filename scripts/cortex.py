@@ -362,24 +362,43 @@ Reply with exactly YES or NO."""
 def parse_daily_entries(body: str) -> list[dict]:
     entries = []
     current_type = None
+    current_entry_lines = []
+
+    def flush_entry():
+        if current_type and current_entry_lines:
+            text = " ".join(current_entry_lines).strip()
+            # Strip leading bullet or bold markers
+            text = re.sub(r"^[-*]+\s*", "", text)
+            text = re.sub(r"^\*\*[^*]+\*\*:\s*", "", text) if text.startswith("**") else text
+            if text and text.lower() != "(none)" and len(text) > 5:
+                entries.append({"type": current_type, "text": text[:300]})
+
     for line in body.split("\n"):
         line = line.strip()
         if line.startswith("## Corrections"):
-            current_type = "correction"
+            flush_entry(); current_entry_lines = []; current_type = "correction"
         elif line.startswith("## Decisions"):
-            current_type = "decision"
+            flush_entry(); current_entry_lines = []; current_type = "decision"
         elif line.startswith("## Gotchas"):
-            current_type = "gotcha"
+            flush_entry(); current_entry_lines = []; current_type = "gotcha"
         elif line.startswith("## Patterns"):
-            current_type = "pattern"
+            flush_entry(); current_entry_lines = []; current_type = "pattern"
         elif line.startswith("## Mistakes"):
-            current_type = "mistake"
-        elif line.startswith("## Session:"):
-            continue
-        elif line.startswith("- ") and current_type:
-            text = line[2:].strip()
-            if text and text != "(none)":
-                entries.append({"type": current_type, "text": text})
+            flush_entry(); current_entry_lines = []; current_type = "mistake"
+        elif line.startswith("## Session:") or line.startswith("## ") or line.startswith("# "):
+            flush_entry(); current_entry_lines = []; current_type = None
+        elif line.startswith("---"):
+            flush_entry(); current_entry_lines = []
+        elif current_type:
+            if line.startswith("- ") or line.startswith("**"):
+                # New entry starts
+                flush_entry()
+                current_entry_lines = [line.lstrip("- ")]
+            elif line and line.lower() != "(none)":
+                # Continuation of current entry
+                current_entry_lines.append(line)
+
+    flush_entry()
     return entries
 
 
