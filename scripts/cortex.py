@@ -231,6 +231,70 @@ def compute_confidence(observations: int, sessions: int, last_seen: date) -> flo
     return min(1.0, (observations * obs_w) + (sessions * sess_w) + recency)
 
 
+# --- Project Name from Encoded Path ---
+
+
+def project_name_from_encoded_dir(encoded_dir_name: str) -> str:
+    """Extract project name from Claude Code's encoded project directory.
+    e.g., '-Users-johndoe-Documents-Projects-my-project' -> 'my-project'
+    """
+    raw = encoded_dir_name.lstrip("-")
+    home_parts = str(Path.home()).lstrip("/").split("/")
+    home_encoded = "-".join(home_parts)
+
+    if raw.startswith(home_encoded):
+        remainder = raw[len(home_encoded):].lstrip("-")
+        if not remainder:
+            return "unknown"
+        # Try to reconstruct the actual filesystem path
+        # by testing progressively which segments are dirs
+        test_base = Path.home()
+        segments = remainder.split("-")
+        resolved = []
+        i = 0
+        while i < len(segments):
+            # Try increasingly long dash-joined segments
+            for end in range(len(segments), i, -1):
+                candidate = "-".join(segments[i:end])
+                if (test_base / candidate).exists():
+                    test_base = test_base / candidate
+                    resolved.append(candidate)
+                    i = end
+                    break
+            else:
+                # No match found, take single segment
+                candidate = segments[i]
+                test_base = test_base / candidate
+                resolved.append(candidate)
+                i += 1
+        return resolved[-1] if resolved else "unknown"
+
+    # Fallback: last meaningful segment
+    return raw.rsplit("-", 1)[-1] if "-" in raw else raw
+
+
+def project_name_from_jsonl(jsonl_path: Path) -> Optional[str]:
+    """Try to extract project name from JSONL session file metadata."""
+    try:
+        with open(jsonl_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    data = json.loads(line)
+                    cwd = data.get("cwd") or data.get("workingDirectory")
+                    if cwd:
+                        return os.path.basename(cwd)
+                except json.JSONDecodeError:
+                    continue
+                # Only check first 5 lines
+                break
+    except (OSError, IOError):
+        pass
+    return None
+
+
 # --- Slugify ---
 
 
@@ -252,29 +316,31 @@ def is_setup() -> bool:
 
 # --- Capture ---
 
-CAPTURE_PROMPT = """Analyze this Claude Code session transcript. Extract learnings in these categories:
+CAPTURE_PROMPT = """Analyze this Claude Code session transcript. Extract learnings in exactly this format:
 
 ## Corrections
-Lines where the user corrected Claude's approach (said "no", "wrong", "not like that", "actually", "instead") and Claude changed behavior. State what was wrong and what the correct approach is.
+- <what was wrong> -> <what the correct approach is>
 
 ## Decisions
-Explicit choices between alternatives with rationale. State the decision and why.
+- <decision made> because <rationale>
 
 ## Gotchas
-Something unexpected that caused a retry, failure, or surprise. State what happened and how to avoid it.
+- <what happened> -- avoid by <how to prevent>
 
 ## Patterns
-Workflows or approaches that worked well and were repeated or praised. State the pattern.
+- <pattern description>
 
 ## Mistakes
-Things Claude did wrong that had to be fixed (wrong file, wrong method, bad code). State the mistake and the fix.
+- <what went wrong> -> <the fix>
 
 Rules:
+- EVERY entry MUST start with "- " (dash space) on its own line
+- Each entry must be 1-2 sentences max, on a single line
 - Only include items with clear evidence in the transcript
-- Each item should be 1-2 sentences max
 - Skip trivial items (typos, formatting)
-- If a category has no items, write "(none)"
-- Do NOT include items that are project-specific one-off facts
+- If a category has no items, write "- (none)"
+- Do NOT include project-specific one-off facts
+- Do NOT use bold (**) formatting
 
 Transcript:
 {transcript}"""
@@ -404,7 +470,10 @@ def parse_daily_entries(body: str) -> list[dict]:
 
 def find_duplicate(text: str, articles: list[tuple[Path, dict, str]]) -> Optional[Path]:
     for path, meta, body in articles:
-        response = ask_haiku(DEDUP_PROMPT.format(a=text, b=body), timeout=15)
+        response = ask_haiku(DEDUP_PROMPT.format(a=text, b=body), timeout=30)
+        if response is None:
+            # Retry once on timeout
+            response = ask_haiku(DEDUP_PROMPT.format(a=text, b=body), timeout=30)
         if response and response.strip().upper().startswith("YES"):
             return path
     return None
@@ -438,9 +507,11 @@ def sweep_uncaptured_sessions(max_sessions: int = 20):
     candidates = candidates[:max_sessions]
 
     swept = 0
-    for mtime, jsonl, project_dir in candidates:
+    total = len(candidates)
+    for idx, (mtime, jsonl, project_dir) in enumerate(candidates):
         session_date = date.fromtimestamp(mtime).isoformat()
-        project_name = project_dir.name.rsplit("-", 1)[-1] if "-" in project_dir.name else project_dir.name
+        # Try JSONL metadata first, then decode from directory name
+        project_name = project_name_from_jsonl(jsonl) or project_name_from_encoded_dir(project_dir.name)
         daily_file = ddir / f"{session_date}-{project_name}.md"
         if daily_file.exists() and jsonl.stem in daily_file.read_text():
             continue
@@ -460,6 +531,7 @@ def sweep_uncaptured_sessions(max_sessions: int = 20):
             write_article(daily_file, meta, f"## Session: {jsonl.stem}\n\n{result}")
         swept += 1
         log.info(f"Sweep captured: {jsonl.stem} -> {daily_file.name}")
+        print(f"  Sweep {swept}/{total}: {project_name} ({session_date})", file=sys.stderr)
 
     if swept:
         log.info(f"Sweep complete: {swept} sessions captured (max {max_sessions} per run)")
@@ -486,11 +558,11 @@ def cmd_compile(args):
         existing.append((kf, meta, body))
 
     compiled_count = 0
-    for df in sorted(ddir.glob("*.md")):
+    daily_files = [df for df in sorted(ddir.glob("*.md")) if not read_article(df)[0].get("compiled")]
+    for df_idx, df in enumerate(daily_files):
         meta, body = read_article(df)
-        if meta.get("compiled"):
-            continue
         project = meta.get("project", "unknown")
+        print(f"  Compiling {df.name} ({df_idx + 1}/{len(daily_files)})...", file=sys.stderr)
         entries = parse_daily_entries(body)
         session_date = meta.get("date", date.today().isoformat())
 
