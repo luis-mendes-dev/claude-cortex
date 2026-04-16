@@ -1,0 +1,38 @@
+{
+  "name": "claude-cortex",
+  "description": "Self-learning system for Claude Code. Captures learnings from every session, compiles knowledge, auto-promotes to CLAUDE.md rules and skills, decays stale patterns. Zero manual steps.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Luis Mendes",
+    "url": "https://github.com/johndoe"
+  },
+  "repository": "https://github.com/johndoe/claude-cortex",
+  "homepage": "https://github.com/johndoe/claude-cortex",
+  "license": "MIT",
+  "keywords": [
+    "learning",
+    "memory",
+    "self-improving",
+    "knowledge",
+    "auto-rules",
+    "context",
+    "self-learning",
+    "feedback-loop"
+  ],
+  "skills": ["./skills/cortex"],
+  "commands": ["./commands/cortex.md", "./commands/cortex/setup.md"],
+  "hooks": "./.claude-plugin/hooks.json",
+  "interface": {
+    "displayName": "Cortex",
+    "shortDescription": "Self-learning system that makes Claude Code smarter over time",
+    "longDescription": "Cortex captures corrections, patterns, decisions, and mistakes from every Claude Code session. It compiles them into scored knowledge articles, promotes high-confidence patterns to CLAUDE.md rules and skill files automatically, and decays stale patterns. The first tool to close the full learning loop: capture, compile, promote, decay.",
+    "developerName": "Luis Mendes",
+    "category": "workflow",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "What has Cortex learned so far?",
+      "Set up Cortex for this machine"
+    ],
+    "brandColor": "#8B5CF6"
+  }
+}

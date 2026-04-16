@@ -1,0 +1,34 @@
+{
+  "name": "claude-cortex",
+  "id": "claude-cortex",
+  "owner": {
+    "name": "Luis Mendes"
+  },
+  "metadata": {
+    "description": "Self-learning system for Claude Code. The first plugin to close the full learning loop.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "claude-cortex",
+      "source": "./",
+      "description": "Captures learnings from every session, compiles into knowledge articles, promotes high-confidence patterns to CLAUDE.md rules and skills, decays stale patterns. Zero manual steps after setup.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Luis Mendes"
+      },
+      "homepage": "https://github.com/johndoe/claude-cortex",
+      "repository": "https://github.com/johndoe/claude-cortex",
+      "license": "MIT",
+      "keywords": [
+        "learning",
+        "memory",
+        "self-improving",
+        "knowledge",
+        "auto-rules",
+        "context"
+      ],
+      "category": "workflow"
+    }
+  ]
+}

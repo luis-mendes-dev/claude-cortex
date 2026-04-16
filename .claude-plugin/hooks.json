@@ -1,0 +1,23 @@
+{
+  "SessionEnd": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "_R=\"${CLAUDE_PLUGIN_ROOT}\"; [ -z \"$_R\" ] && _R=\"$(cd \"$(dirname \"$0\")/..\" 2>/dev/null && pwd)\"; [ -d \"$HOME/.claude/learning\" ] && python3 \"$_R/scripts/cortex.py\" capture || true",
+          "timeout": 60000
+        }
+      ]
+    }
+  ],
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "_R=\"${CLAUDE_PLUGIN_ROOT}\"; [ -z \"$_R\" ] && _R=\"$(cd \"$(dirname \"$0\")/..\" 2>/dev/null && pwd)\"; [ -d \"$HOME/.claude/learning\" ] && python3 \"$_R/scripts/cortex.py\" inject || true"
+        }
+      ]
+    }
+  ]
+}

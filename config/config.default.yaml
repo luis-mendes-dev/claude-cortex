@@ -1,0 +1,30 @@
+capture:
+  max_transcript_chars: 50000
+  timeout_seconds: 30
+  claude_model: haiku
+
+compile:
+  dedup_threshold: 0.85
+
+confidence:
+  observation_weight: 0.15
+  session_weight: 0.20
+  recency_bonus: 0.10
+  recency_window_days: 7
+
+promote:
+  rule_confidence: 0.85
+  rule_min_sessions: 3
+  skill_confidence: 0.90
+  skill_min_sessions: 5
+  skill_min_articles: 3
+  max_active_rules: 30
+  max_active_skills: 10
+
+decay:
+  grace_period_days: 14
+  rate_per_day: 0.02
+  retirement_threshold: 0.40
+
+inject:
+  max_patterns: 10
